@@ -67,7 +67,7 @@ object DockerImagePlugin extends AutoPlugin {
       pushDockerImage := pushDockerImageTask.value,
       imageTag := (ThisBuild / version).value,
       dockerRepository := "ghcr.io",
-      dockerNamespace := "etspaceman",
+      dockerNamespace := "punsoong-canva",
       serviceFileLocation := "docker/image/lib/",
       serviceFileName := "main.js",
       dockerfileLocation := "docker/",

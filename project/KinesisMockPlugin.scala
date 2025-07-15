@@ -57,7 +57,7 @@ object KinesisMockPlugin extends AutoPlugin {
     tlCiScalafixCheck := true,
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
-    organization := "io.github.etspaceman",
+    organization := "io.github.punsoong-canva",
     startYear := Some(2021),
     licenses := Seq(License.MIT),
     semanticdbEnabled := true,
