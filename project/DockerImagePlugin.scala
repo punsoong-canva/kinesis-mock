@@ -102,8 +102,6 @@ object DockerImagePluginKeys {
   val dockerfile = settingKey[String]("Dockerfile to use, e.g. Dockerfile")
   val buildDockerImage =
     taskKey[Unit]("Builds the docker images defined in the project.")
-  val buildSinglePlatformDockerImage =
-    taskKey[Unit]("Builds a single-platform docker image for local development.")
   val pushDockerImage =
     taskKey[Unit]("Pushes the docker image tag defined in the project.")
 }
