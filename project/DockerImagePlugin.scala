@@ -64,7 +64,8 @@ object DockerImagePlugin extends AutoPlugin {
          |  --push \\
          |  .""".stripMargin
     log.info(s"Running $cmd")
-    val res = cmd.!
+
+    val res = cmd.replace("\\", "").!
     if (res != 0)
       throw new IllegalStateException(s"docker buildx push returned $res")
   }
