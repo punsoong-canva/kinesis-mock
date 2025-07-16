@@ -17,7 +17,7 @@ object DockerImagePlugin extends AutoPlugin {
     s"${dockerRepository.value}/${dockerNamespace.value}/${name.value}:$version"
   }
 
-      val buildDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
+        val buildDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
     val log = sbt.Keys.streams.value.log
 
     // Create a new builder instance for multi-platform builds if it doesn't exist
@@ -51,6 +51,22 @@ object DockerImagePlugin extends AutoPlugin {
       throw new IllegalStateException(s"docker buildx build returned $res")
   }
 
+  val buildSinglePlatformDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
+    val log = sbt.Keys.streams.value.log
+
+    val cmd =
+      s"""docker build \\
+         |  --build-arg DOCKER_SERVICE_FILE=${serviceFileLocation.value}${serviceFileName.value} \\
+         |  -f ${dockerfileLocation.value + dockerfile.value} \\
+         |  -t ${dockerTagTask.value} \\
+         |  .""".stripMargin
+    log.info(s"Running $cmd")
+
+    val res = cmd.replace("\\", "").!
+    if (res != 0)
+      throw new IllegalStateException(s"docker build returned $res")
+  }
+
   val pushDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
     val log = sbt.Keys.streams.value.log
 
@@ -72,6 +88,7 @@ object DockerImagePlugin extends AutoPlugin {
   def settings: Seq[Setting[_]] =
     Seq(
       buildDockerImage := buildDockerImageTask.value,
+      buildSinglePlatformDockerImage := buildSinglePlatformDockerImageTask.value,
       pushDockerImage := pushDockerImageTask.value,
       imageTag := (ThisBuild / version).value,
       dockerRepository := "ghcr.io",
@@ -102,6 +119,8 @@ object DockerImagePluginKeys {
   val dockerfile = settingKey[String]("Dockerfile to use, e.g. Dockerfile")
   val buildDockerImage =
     taskKey[Unit]("Builds the docker images defined in the project.")
+  val buildSinglePlatformDockerImage =
+    taskKey[Unit]("Builds a single-platform docker image for local development.")
   val pushDockerImage =
     taskKey[Unit]("Pushes the docker image tag defined in the project.")
 }
