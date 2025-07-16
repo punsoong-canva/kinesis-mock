@@ -247,7 +247,7 @@ object KinesisMockPlugin extends AutoPlugin {
             ),
             WorkflowStep.Run(
               List(
-                "echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin"
+                "echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin"
               ),
               name = Some("Login to registry"),
               cond = Some(primaryJavaOSCond.value)
