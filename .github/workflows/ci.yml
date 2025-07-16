@@ -199,9 +199,13 @@ jobs:
         if: matrix.java == 'temurin@21' && matrix.os == 'ubuntu-22.04'
         run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
-      - name: Build and push Docker Image
+      - name: Build Docker Image
         if: matrix.java == 'temurin@21' && matrix.os == 'ubuntu-22.04'
         run: sbt '++ ${{ matrix.scala }}' kinesis-mockJS/buildDockerImage
+
+      - name: Push to registry
+        if: matrix.java == 'temurin@21' && matrix.os == 'ubuntu-22.04'
+        run: sbt '++ ${{ matrix.scala }}' kinesis-mockJS/pushDockerImage
 
   publishJSAssets:
     name: Publish JS Assets

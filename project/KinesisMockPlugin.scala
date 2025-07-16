@@ -57,7 +57,7 @@ object KinesisMockPlugin extends AutoPlugin {
     tlCiScalafixCheck := true,
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
-    organization := "io.github.etspaceman",
+    organization := "io.github.punsoong-canva",
     startYear := Some(2021),
     licenses := Seq(License.MIT),
     semanticdbEnabled := true,
@@ -254,7 +254,12 @@ object KinesisMockPlugin extends AutoPlugin {
             ),
             WorkflowStep.Sbt(
               List("kinesis-mockJS/buildDockerImage"),
-              name = Some("Build and push Docker Image"),
+              name = Some("Build Docker Image"),
+              cond = Some(primaryJavaOSCond.value)
+            ),
+            WorkflowStep.Sbt(
+              List("kinesis-mockJS/pushDockerImage"),
+              name = Some("Push to registry"),
               cond = Some(primaryJavaOSCond.value)
             )
           ),
