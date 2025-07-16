@@ -17,7 +17,7 @@ object DockerImagePlugin extends AutoPlugin {
     s"${dockerRepository.value}/${dockerNamespace.value}/${name.value}:$version"
   }
 
-    val buildDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
+      val buildDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
     val log = sbt.Keys.streams.value.log
 
     // Create a new builder instance for multi-platform builds if it doesn't exist
@@ -42,7 +42,7 @@ object DockerImagePlugin extends AutoPlugin {
          |  --build-arg DOCKER_SERVICE_FILE=${serviceFileLocation.value}${serviceFileName.value} \\
          |  -f ${dockerfileLocation.value + dockerfile.value} \\
          |  -t ${dockerTagTask.value} \\
-         |  --push \\
+         |  --load \\
          |  .""".stripMargin
     log.info(s"Running $cmd")
 
@@ -53,12 +53,20 @@ object DockerImagePlugin extends AutoPlugin {
 
   val pushDockerImageTask: Def.Initialize[Task[Unit]] = Def.task {
     val log = sbt.Keys.streams.value.log
-    val cmd = s"""docker push ${dockerTagTask.value}"""
 
+    // For multi-arch images, we need to use buildx to push
+    val cmd =
+      s"""docker buildx build \\
+         |  --platform linux/amd64,linux/arm64 \\
+         |  --build-arg DOCKER_SERVICE_FILE=${serviceFileLocation.value}${serviceFileName.value} \\
+         |  -f ${dockerfileLocation.value + dockerfile.value} \\
+         |  -t ${dockerTagTask.value} \\
+         |  --push \\
+         |  .""".stripMargin
     log.info(s"Running $cmd")
     val res = cmd.!
     if (res != 0)
-      throw new IllegalStateException(s"docker build returned $res")
+      throw new IllegalStateException(s"docker buildx push returned $res")
   }
 
   def settings: Seq[Setting[_]] =
